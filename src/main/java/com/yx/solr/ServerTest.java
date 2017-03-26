@@ -43,9 +43,12 @@ public class ServerTest {
         SolrInputDocument document = new SolrInputDocument();
         //往doc中添加字段,在客户端这边添加的字段必须在服务端中有过定义
         document.addField("id", "number001");
-        document.addField("title_ik", "浙大恒久远");
-        document.addField("content_ik", "软院永流传");
+        document.addField("name", "中国牛逼啊");
+
+        /*document.setField("id", "number001");
+        document.setField("name", "中国牛逼啊");如果存在就先删除再添加（所谓的修改），不存在直接添加，*/
         server.add(document);
+        server.optimize();//不要频繁的调用..尽量在无人使用时调用.
         server.commit();
     }
 
@@ -72,8 +75,8 @@ public class ServerTest {
      *
      */
     @Test
-    public void query() throws SolrServerException {
-        SolrQuery query = new SolrQuery("solr");
+    public void query() throws SolrServerException, IOException {
+        SolrQuery query = new SolrQuery("中国");
         //给query设置一个主查询条件
         //query.set("q", "*:*");//查询所有
 
@@ -104,6 +107,7 @@ public class ServerTest {
         query.setHighlightSimplePost("</em>");
         QueryResponse response = server.query(query);
         SolrDocumentList solrDocumentList = response.getResults();
+
         System.out.println("查询结果的总数量：" + solrDocumentList.getNumFound());
 
         for (SolrDocument solrDocument : solrDocumentList) {
