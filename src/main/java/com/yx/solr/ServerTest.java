@@ -99,12 +99,12 @@ public class ServerTest {
         query.setRows(20);
 
         //设置高亮
-//        query.setHighlight(true);
-        //设置高亮的字段
-//        query.addHighlightField("name");
-        //设置高亮的样式
-//        query.setHighlightSimplePre("<em>");
-//        query.setHighlightSimplePost("</em>");
+        query.setHighlight(true);
+//        设置高亮的字段
+        query.addHighlightField("name");
+//        设置高亮的样式
+        query.setHighlightSimplePre("<em>");
+        query.setHighlightSimplePost("</em>");
         QueryResponse response = server.query(query);
         SolrDocumentList solrDocumentList = response.getResults();
         for (SolrDocument solrDocument : solrDocumentList) {
