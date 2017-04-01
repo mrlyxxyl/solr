@@ -25,7 +25,7 @@ public class ServerTest {
 
 
     private SolrServer server;
-    private static final String DEFAULT_URL = "http://192.168.1.101:8983/solr/";
+    private static final String DEFAULT_URL = "http://localhost:8983/solr/ljggfwpt/";
 
     @Before
     public void init() {
@@ -76,7 +76,7 @@ public class ServerTest {
      */
     @Test
     public void query() throws SolrServerException, IOException {
-        SolrQuery query = new SolrQuery("中国");
+        SolrQuery query = new SolrQuery("*:*");
         //给query设置一个主查询条件
         //query.set("q", "*:*");//查询所有
 
@@ -91,28 +91,24 @@ public class ServerTest {
         //给query设置默认搜索域
 //        query.set("df", "product_keywords");
 
-        //设置返回结果的排序规则
-//        query.setSort("product_price", ORDER.desc);
+        //设置返回结果的排序规则、需要在schema.xml文件中设置 multiValued="false"
+        query.setSort("UPDATE_TIME", SolrQuery.ORDER.desc);
 
         //设置分页参数
         query.setStart(0);
         query.setRows(20);
 
         //设置高亮
-        query.setHighlight(true);
+//        query.setHighlight(true);
         //设置高亮的字段
-        query.addHighlightField("name");
+//        query.addHighlightField("name");
         //设置高亮的样式
-        query.setHighlightSimplePre("<em>");
-        query.setHighlightSimplePost("</em>");
+//        query.setHighlightSimplePre("<em>");
+//        query.setHighlightSimplePost("</em>");
         QueryResponse response = server.query(query);
         SolrDocumentList solrDocumentList = response.getResults();
-
-        System.out.println("查询结果的总数量：" + solrDocumentList.getNumFound());
-
         for (SolrDocument solrDocument : solrDocumentList) {
-            System.out.println(solrDocument.get("id"));
-            System.out.println(solrDocument.get("name"));
+            System.out.println(solrDocument.getFieldValue("PRJ_SEARCH_TYPE") + "-----" + solrDocument.getFieldValue("GUID") + "-----" + solrDocument.getFieldValue("UPDATE_TIME") + "-----" + solrDocument.getFieldValue("BULLETINNAME"));
         }
     }
 
