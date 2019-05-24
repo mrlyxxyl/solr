@@ -1,6 +1,7 @@
 package com.yx.solr;
 
 import com.yx.bean.Animal;
+import com.yx.bean.Person;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
@@ -25,7 +26,7 @@ public class ServerTest {
 
 
     private SolrServer server;
-    private static final String DEFAULT_URL = "http://localhost:8983/solr/ljggfwpt/";
+    private static final String DEFAULT_URL = "http://10.40.40.125:8983/solr/new_core/";
 
     @Before
     public void init() {
@@ -43,7 +44,8 @@ public class ServerTest {
         SolrInputDocument document = new SolrInputDocument();
         //往doc中添加字段,在客户端这边添加的字段必须在服务端中有过定义
         document.addField("id", "number001");
-        document.addField("name", "中国牛逼啊");
+        document.addField("name", "中国牛逼啊,实在是太牛逼了");
+        document.addField("age", "12");
 
         /*document.setField("id", "number001");
         document.setField("name", "中国牛逼啊");如果存在就先删除再添加（所谓的修改），不存在直接添加，*/
@@ -76,23 +78,23 @@ public class ServerTest {
      */
     @Test
     public void query() throws SolrServerException, IOException {
-        SolrQuery query = new SolrQuery("*:*");
+        SolrQuery query = new SolrQuery("name:中国");
         //给query设置一个主查询条件
         //query.set("q", "*:*");//查询所有
 
-//        query.set("q", "solr");
+        //        query.set("q", "solr");
 
         //给query增加过滤查询条件
-//        query.addFilterQuery("product_price:[0 TO 200]");
+        //        query.addFilterQuery("product_price:[0 TO 200]");
 
         //给query增加布尔过滤条件
         //query.addFilterQuery("-product_name:台灯");
 
         //给query设置默认搜索域
-//        query.set("df", "product_keywords");
+        //        query.set("df", "product_keywords");
 
         //设置返回结果的排序规则、需要在schema.xml文件中设置 multiValued="false"
-        query.setSort("UPDATE_TIME", SolrQuery.ORDER.desc);
+        query.setSort("id", SolrQuery.ORDER.asc);
 
         //设置分页参数
         query.setStart(0);
@@ -100,27 +102,27 @@ public class ServerTest {
 
         //设置高亮
         query.setHighlight(true);
-//        设置高亮的字段
+        //        设置高亮的字段
         query.addHighlightField("name");
-//        设置高亮的样式
+        //        设置高亮的样式
         query.setHighlightSimplePre("<em>");
         query.setHighlightSimplePost("</em>");
         QueryResponse response = server.query(query);
         SolrDocumentList solrDocumentList = response.getResults();
         for (SolrDocument solrDocument : solrDocumentList) {
-            System.out.println(solrDocument.getFieldValue("PRJ_SEARCH_TYPE") + "-----" + solrDocument.getFieldValue("GUID") + "-----" + solrDocument.getFieldValue("UPDATE_TIME") + "-----" + solrDocument.getFieldValue("BULLETINNAME"));
+            System.out.println(solrDocument.getFieldValue("id") + "-----" + solrDocument.getFieldValue("name") + "-----" + solrDocument.getFieldValue("age"));
         }
     }
 
     @Test
     public void queryBeans() {
         try {
-            SolrQuery params = new SolrQuery("name_*");//通配符
-            params.addSort("name", SolrQuery.ORDER.desc);
+            SolrQuery params = new SolrQuery("name:中国");//通配符  *:*
+            params.addSort("id", SolrQuery.ORDER.asc);
             QueryResponse response = server.query(params);
-            List<Animal> animals = response.getBeans(Animal.class);
-            for (Animal animal : animals) {
-                System.out.println(animal);
+            List<Person> persons = response.getBeans(Person.class);
+            for (Person person : persons) {
+                System.out.println(person);
             }
         } catch (SolrServerException e) {
             e.printStackTrace();
